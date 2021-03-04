@@ -22,11 +22,11 @@ def index():
     cur.close()
     return render_template('index.html',students=data)
 
-
+#Insert data to DB
 @app.route('/insert',methods=['POST'])
 def insert():
 
-    #Add data to DB
+
     if request.method == 'POST':
         flash('Data Inserted Successfully')
         name = request.form['name']
@@ -36,8 +36,10 @@ def insert():
         cur = mysql.connection.cursor()
         cur.execute('INSERT INTO students (name,email,phone) values (%s,%s,%s)',(name,email,phone))
         mysql.connection.commit()
+        cur.close()
         return redirect(url_for('index'))
 
+#Update data to DB
 @app.route('/update',methods=['POST','GET'])
 def update():
     if request.method == 'POST':
@@ -55,7 +57,19 @@ def update():
         """,(name,email,phone,id_data))
         flash("Data Updated Successfully")
         mysql.connection.commit()
+        cur.close()
         return redirect(url_for('index'))
+
+#Delete data from DB
+@app.route('/delete/<string:id_data>',methods=['GET'])
+def delete(id_data):
+
+    cur = mysql.connection.cursor()
+    cur.execute(f'DELETE from students where id={id_data}')
+    mysql.connection.commit()
+    flash("Record Has Been Deleted Successfully")
+    cur.close()
+    return redirect(url_for('index'))
 
 
 if __name__ == '__main__':
